@@ -1,13 +1,18 @@
 import streamlit as st
 from rag_engine import load_base, ask_rag
+
 st.set_page_config(page_title = "SIET_Chatbot", layout = "centered")
 st.title("Shridevi Institute of Engineering and Technology - Chatbot")
 st.caption("Ask anythimg about the college information,cource,Placements,FAQs,Rules and regulation"")
 st.caption("RAM pipeline with multiple files")
+st.caption("Created by KUBENDRA T")
+
+mykey = st.secrest["GROQ_API_KEY"]           
 
 @st.cache_resource
 def initiate_rag():
   return load_base("college_docs")
+  
 index, embed_model, chunks = initiate_rag()
 
 if "chat_hist" not in st.session_state:
@@ -22,16 +27,34 @@ question = st.chat_input("Ask anything SIET collage..... ")
 
 if question:
   st.session_state.chat_hist.append(
-    {"role" :"user" , "content" : question})
+    {
+      "role" :"user" , "content" : question
+    }
+  )
   with st.chat_message("user"):
     st.write(question)
+    
   with st.chat_message("assistant"):
     with st.spinner("Asking RAG for answer........"):
-      answer = ask_rag (question, embed_model, chunks, index, api_key = mykey )
+      
+      answer = ask_rag( 
+      question, 
+       embed_model,
+       chunks, 
+       index, 
+       api_key = mykey
+      )
       st.write(answer)
+      
       st.session_state.chat_hist.append(
-       {"role" :"assistant" , "content" : answer})
+       {
+         "role" :"assistant" , "content" : answer 
+       }
+      )
+      btn = st.button("clear chat")
 
-if st.button("Clear chat"):
-  st.session_state.chat_hist = []
-  st.rerun()
+if btn:
+  
+st.button("Clear chat"):
+st.session_state.chat_hist = []
+st.rerun()
